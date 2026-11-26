@@ -1,761 +1,1001 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-    <title>PQA Quality Dashboard</title>
+  <title>PQA Quality Dashboard</title>
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f3f5f8;
-            color: #1f2937;
-        }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f8;
+      color: #1f2937;
+    }
 
-        header {
-            background: #111827;
-            color: white;
-            padding: 22px 30px;
-        }
+    header {
+      background: #111827;
+      color: white;
+      padding: 22px 30px;
+    }
 
-        header h1 {
-            margin: 0;
-            font-size: 26px;
-        }
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
 
-        header p {
-            margin: 6px 0 0;
-            color: #cbd5e1;
-        }
+    header p {
+      margin: 6px 0 0;
+      color: #cbd5e1;
+    }
 
-        main {
-            max-width: 1400px;
-            margin: auto;
-            padding: 24px;
-        }
+    main {
+      max-width: 1400px;
+      margin: auto;
+      padding: 24px;
+    }
 
-        .warning {
-            background: #fff7ed;
-            border-left: 5px solid #f97316;
-            border-radius: 8px;
-            padding: 14px 18px;
-            margin-bottom: 20px;
-        }
+    .warning {
+      background: #fff7ed;
+      border-left: 5px solid #f97316;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 20px;
+    }
 
-        .filters {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: end;
-            gap: 15px;
-            background: white;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+    .connection-status {
+      padding: 11px 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-        .filter-group {
-            min-width: 180px;
-        }
+    .connection-loading {
+      color: #1e40af;
+      background: #dbeafe;
+    }
 
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            font-size: 14px;
-        }
+    .connection-success {
+      color: #166534;
+      background: #dcfce7;
+    }
 
-        select,
-        input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #cbd5e1;
-            border-radius: 7px;
-            background: white;
-        }
+    .connection-error {
+      color: #991b1b;
+      background: #fee2e2;
+    }
 
-        button {
-            border: none;
-            border-radius: 7px;
-            padding: 11px 18px;
-            background: #2563eb;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: end;
+      gap: 15px;
+      background: white;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
 
-        button:hover {
-            background: #1d4ed8;
-        }
+    .filter-group {
+      min-width: 180px;
+    }
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 18px;
-            margin-bottom: 20px;
-        }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
 
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border-left: 5px solid #64748b;
-        }
+    select,
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 7px;
+      background: white;
+    }
 
-        .card.total {
-            border-color: #2563eb;
-        }
+    button {
+      border: none;
+      border-radius: 7px;
+      padding: 11px 18px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-        .card.open {
-            border-color: #dc2626;
-        }
+    button:hover {
+      background: #1d4ed8;
+    }
 
-        .card.investigation {
-            border-color: #f59e0b;
-        }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 20px;
+    }
 
-        .card.closed {
-            border-color: #16a34a;
-        }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      border-left: 5px solid #64748b;
+    }
 
-        .card-title {
-            color: #64748b;
-            font-size: 14px;
-            font-weight: bold;
-        }
+    .card.total {
+      border-color: #2563eb;
+    }
 
-        .card-value {
-            margin-top: 8px;
-            font-size: 34px;
-            font-weight: bold;
-        }
+    .card.open {
+      border-color: #dc2626;
+    }
 
-        .panel {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+    .card.investigation {
+      border-color: #f59e0b;
+    }
 
-        .panel h2 {
-            margin-top: 0;
-            font-size: 19px;
-        }
+    .card.closed {
+      border-color: #16a34a;
+    }
 
-        .chart-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+    .card-title {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: bold;
+    }
 
-        .bar-row {
-            display: grid;
-            grid-template-columns: 140px 1fr 40px;
-            align-items: center;
-            gap: 10px;
-            margin: 12px 0;
-        }
+    .card-value {
+      margin-top: 8px;
+      font-size: 34px;
+      font-weight: bold;
+    }
 
-        .bar-track {
-            height: 22px;
-            background: #e5e7eb;
-            border-radius: 5px;
-            overflow: hidden;
-        }
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
 
-        .bar-fill {
-            height: 100%;
-            background: #2563eb;
-            transition: width 0.3s;
-        }
+    .panel h2 {
+      margin-top: 0;
+      font-size: 19px;
+    }
 
-        .bar-fill.status-open {
-            background: #dc2626;
-        }
+    .chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
 
-        .bar-fill.status-investigation {
-            background: #f59e0b;
-        }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 140px 1fr 40px;
+      align-items: center;
+      gap: 10px;
+      margin: 12px 0;
+    }
 
-        .bar-fill.status-closed {
-            background: #16a34a;
-        }
+    .bar-track {
+      height: 22px;
+      background: #e5e7eb;
+      border-radius: 5px;
+      overflow: hidden;
+    }
 
-        .table-container {
-            overflow-x: auto;
-        }
+    .bar-fill {
+      height: 100%;
+      background: #2563eb;
+      transition: width 0.3s;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 900px;
-        }
+    .bar-fill.status-open {
+      background: #dc2626;
+    }
 
-        th,
-        td {
-            text-align: left;
-            padding: 13px;
-            border-bottom: 1px solid #e5e7eb;
-        }
+    .bar-fill.status-investigation {
+      background: #f59e0b;
+    }
 
-        th {
-            background: #f8fafc;
-            color: #475569;
-        }
+    .bar-fill.status-closed {
+      background: #16a34a;
+    }
 
-        tbody tr:hover {
-            background: #f8fafc;
-        }
+    .bar-fill.status-containment {
+      background: #ea580c;
+    }
 
-        .badge {
-            display: inline-block;
-            border-radius: 999px;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: bold;
-        }
+    .bar-fill.status-countermeasure {
+      background: #7c3aed;
+    }
 
-        .badge-open {
-            color: #991b1b;
-            background: #fee2e2;
-        }
+    .bar-fill.status-effectiveness-monitoring {
+      background: #0891b2;
+    }
 
-        .badge-investigation {
-            color: #92400e;
-            background: #fef3c7;
-        }
+    .table-container {
+      overflow-x: auto;
+    }
 
-        .badge-closed {
-            color: #166534;
-            background: #dcfce7;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
 
-        .overdue {
-            color: #dc2626;
-            font-weight: bold;
-        }
+    th,
+    td {
+      text-align: left;
+      padding: 13px;
+      border-bottom: 1px solid #e5e7eb;
+    }
 
-        .empty-message {
-            text-align: center;
-            padding: 30px;
-            color: #64748b;
-        }
+    th {
+      background: #f8fafc;
+      color: #475569;
+    }
 
-        footer {
-            text-align: center;
-            padding: 25px;
-            color: #64748b;
-            font-size: 13px;
-        }
+    tbody tr:hover {
+      background: #f8fafc;
+    }
 
-        @media (max-width: 900px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
-            }
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #334155;
+      background: #e2e8f0;
+    }
 
-            .chart-row {
-                grid-template-columns: 1fr;
-            }
-        }
+    .badge-open {
+      color: #991b1b;
+      background: #fee2e2;
+    }
 
-        @media (max-width: 550px) {
-            main {
-                padding: 14px;
-            }
+    .badge-investigation {
+      color: #92400e;
+      background: #fef3c7;
+    }
 
-            .cards {
-                grid-template-columns: 1fr;
-            }
+    .badge-closed {
+      color: #166534;
+      background: #dcfce7;
+    }
 
-            header {
-                padding: 18px;
-            }
-        }
-    </style>
+    .badge-containment {
+      color: #9a3412;
+      background: #ffedd5;
+    }
+
+    .badge-countermeasure {
+      color: #6b21a8;
+      background: #f3e8ff;
+    }
+
+    .badge-effectiveness-monitoring {
+      color: #155e75;
+      background: #cffafe;
+    }
+
+    .overdue {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 30px;
+      color: #64748b;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .chart-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 550px) {
+      main {
+        padding: 14px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        padding: 18px;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
 <header>
-    <h1>PQA Quality Dashboard</h1>
-    <p>Quality case monitoring and action follow-up</p>
+  <h1>PQA Quality Dashboard</h1>
+  <p>Quality case monitoring and action follow-up</p>
 </header>
 
 <main>
 
-    <div class="warning">
-        <strong>Prototype:</strong>
-        This dashboard uses sample data only.
-        Do not upload confidential company data to a public website.
+  <div class="warning">
+    <strong>Prototype:</strong>
+    This dashboard uses sample data only.
+    Do not upload confidential company data to a public website.
+  </div>
+
+  <div
+    id="connectionStatus"
+    class="connection-status connection-loading"
+  >
+    Connecting to Supabase...
+  </div>
+
+  <section class="filters">
+
+    <div class="filter-group">
+      <label for="supplierFilter">Supplier</label>
+
+      <select id="supplierFilter">
+        <option value="All">All suppliers</option>
+      </select>
     </div>
 
-    <section class="filters">
+    <div class="filter-group">
+      <label for="statusFilter">Status</label>
 
-        <div class="filter-group">
-            <label for="supplierFilter">Supplier</label>
+      <select id="statusFilter">
+        <option value="All">All statuses</option>
+        <option value="Open">Open</option>
+        <option value="Containment">Containment</option>
+        <option value="Investigation">Investigation</option>
+        <option value="Countermeasure">Countermeasure</option>
+        <option value="Effectiveness Monitoring">
+          Effectiveness Monitoring
+        </option>
+        <option value="Closed">Closed</option>
+      </select>
+    </div>
 
-            <select id="supplierFilter">
-                <option value="All">All suppliers</option>
-            </select>
-        </div>
+    <div class="filter-group">
+      <label for="searchInput">Search</label>
 
-        <div class="filter-group">
-            <label for="statusFilter">Status</label>
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="Case ID, part no., concern..."
+      >
+    </div>
 
-            <select id="statusFilter">
-                <option value="All">All statuses</option>
-                <option value="Open">Open</option>
-                <option value="Investigation">Investigation</option>
-                <option value="Closed">Closed</option>
-            </select>
-        </div>
+    <button id="resetButton" type="button">
+      Reset filters
+    </button>
 
-        <div class="filter-group">
-            <label for="searchInput">Search</label>
+  </section>
 
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="Case ID, part no., concern..."
-            >
-        </div>
+  <section class="cards">
 
-        <button id="resetButton" type="button">
-            Reset filters
-        </button>
+    <div class="card total">
+      <div class="card-title">TOTAL CASES</div>
+      <div class="card-value" id="totalCases">0</div>
+    </div>
 
-    </section>
+    <div class="card open">
+      <div class="card-title">OPEN</div>
+      <div class="card-value" id="openCases">0</div>
+    </div>
 
-    <section class="cards">
+    <div class="card investigation">
+      <div class="card-title">INVESTIGATION</div>
+      <div class="card-value" id="investigationCases">0</div>
+    </div>
 
-        <div class="card total">
-            <div class="card-title">TOTAL CASES</div>
-            <div class="card-value" id="totalCases">0</div>
-        </div>
+    <div class="card closed">
+      <div class="card-title">CLOSED</div>
+      <div class="card-value" id="closedCases">0</div>
+    </div>
 
-        <div class="card open">
-            <div class="card-title">OPEN</div>
-            <div class="card-value" id="openCases">0</div>
-        </div>
+  </section>
 
-        <div class="card investigation">
-            <div class="card-title">INVESTIGATION</div>
-            <div class="card-value" id="investigationCases">0</div>
-        </div>
+  <section class="chart-row">
 
-        <div class="card closed">
-            <div class="card-title">CLOSED</div>
-            <div class="card-value" id="closedCases">0</div>
-        </div>
+    <div class="panel">
+      <h2>Cases by Status</h2>
+      <div id="statusChart"></div>
+    </div>
 
-    </section>
+    <div class="panel">
+      <h2>Cases by Supplier</h2>
+      <div id="supplierChart"></div>
+    </div>
 
-    <section class="chart-row">
+  </section>
 
-        <div class="panel">
-            <h2>Cases by Status</h2>
-            <div id="statusChart"></div>
-        </div>
+  <section class="panel">
 
-        <div class="panel">
-            <h2>Cases by Supplier</h2>
-            <div id="supplierChart"></div>
-        </div>
+    <h2>Case Details</h2>
 
-    </section>
+    <div class="table-container">
 
-    <section class="panel">
+      <table>
+        <thead>
+          <tr>
+            <th>Case ID</th>
+            <th>Supplier</th>
+            <th>Part Number</th>
+            <th>Concern</th>
+            <th>Status</th>
+            <th>Owner</th>
+            <th>Due Date</th>
+          </tr>
+        </thead>
 
-        <h2>Case Details</h2>
+        <tbody id="caseTableBody"></tbody>
+      </table>
 
-        <div class="table-container">
+      <div
+        id="emptyMessage"
+        class="empty-message"
+        hidden
+      >
+        No cases match the selected filters.
+      </div>
 
-            <table>
-                <thead>
-                    <tr>
-                        <th>Case ID</th>
-                        <th>Supplier</th>
-                        <th>Part Number</th>
-                        <th>Concern</th>
-                        <th>Status</th>
-                        <th>Owner</th>
-                        <th>Due Date</th>
-                    </tr>
-                </thead>
+    </div>
 
-                <tbody id="caseTableBody"></tbody>
-            </table>
-
-            <div
-                id="emptyMessage"
-                class="empty-message"
-                hidden
-            >
-                No cases match the selected filters.
-            </div>
-
-        </div>
-
-    </section>
+  </section>
 
 </main>
 
 <footer>
-    PQA Quality Dashboard | Sample prototype
+  PQA Quality Dashboard | Supabase realtime prototype
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-    const cases = [
-        {
-            caseId: "Q-001",
-            supplier: "Supplier A",
-            partNo: "46501-ABCDE",
-            concern: "Abnormal pedal noise",
-            status: "Open",
-            owner: "PQA",
-            dueDate: "2026-12-01"
-        },
-        {
-            caseId: "Q-002",
-            supplier: "Supplier B",
-            partNo: "14463-FGHIJ",
-            concern: "Dust seal position",
-            status: "Investigation",
-            owner: "Supplier",
-            dueDate: "2026-12-05"
-        },
-        {
-            caseId: "Q-003",
-            supplier: "Supplier A",
-            partNo: "28090-KLMNO",
-            concern: "Display delamination",
-            status: "Closed",
-            owner: "Design",
-            dueDate: "2026-11-20"
-        },
-        {
-            caseId: "Q-004",
-            supplier: "Supplier C",
-            partNo: "11750-PQRST",
-            concern: "Auto tensioner noise",
-            status: "Closed",
-            owner: "PQA",
-            dueDate: "2026-11-12"
-        },
-        {
-            caseId: "Q-005",
-            supplier: "Supplier B",
-            partNo: "24014-UVWXY",
-            concern: "Harness length confirmation",
-            status: "Investigation",
-            owner: "VQA",
-            dueDate: "2026-12-10"
-        },
-        {
-            caseId: "Q-006",
-            supplier: "Supplier D",
-            partNo: "40015-ZABCD",
-            concern: "TV-Link loose noise",
-            status: "Open",
-            owner: "Supplier",
-            dueDate: "2026-11-25"
-        }
-    ];
-
-    const supplierFilter =
-        document.getElementById("supplierFilter");
-
-    const statusFilter =
-        document.getElementById("statusFilter");
-
-    const searchInput =
-        document.getElementById("searchInput");
-
-    const resetButton =
-        document.getElementById("resetButton");
-
-    function initializeSupplierFilter() {
-        const suppliers = [
-            ...new Set(cases.map(item => item.supplier))
-        ].sort();
-
-        suppliers.forEach(supplier => {
-            const option = document.createElement("option");
-
-            option.value = supplier;
-            option.textContent = supplier;
-
-            supplierFilter.appendChild(option);
-        });
-    }
-
-    function getFilteredCases() {
-        const supplier = supplierFilter.value;
-        const status = statusFilter.value;
-        const searchTerm =
-            searchInput.value.trim().toLowerCase();
-
-        return cases.filter(item => {
-            const matchesSupplier =
-                supplier === "All" ||
-                item.supplier === supplier;
-
-            const matchesStatus =
-                status === "All" ||
-                item.status === status;
-
-            const searchableText = [
-                item.caseId,
-                item.supplier,
-                item.partNo,
-                item.concern,
-                item.status,
-                item.owner
-            ].join(" ").toLowerCase();
-
-            const matchesSearch =
-                searchableText.includes(searchTerm);
-
-            return (
-                matchesSupplier &&
-                matchesStatus &&
-                matchesSearch
-            );
-        });
-    }
-
-    function countStatus(data, status) {
-        return data.filter(
-            item => item.status === status
-        ).length;
-    }
-
-    function updateCards(data) {
-        document.getElementById("totalCases").textContent =
-            data.length;
-
-        document.getElementById("openCases").textContent =
-            countStatus(data, "Open");
-
-        document.getElementById(
-            "investigationCases"
-        ).textContent =
-            countStatus(data, "Investigation");
-
-        document.getElementById("closedCases").textContent =
-            countStatus(data, "Closed");
-    }
-
-    function createBarChart(
-        containerId,
-        values,
-        barClassFunction
-    ) {
-        const container =
-            document.getElementById(containerId);
-
-        container.innerHTML = "";
-
-        const maximum =
-            Math.max(...Object.values(values), 1);
-
-        Object.entries(values).forEach(
-            ([label, value]) => {
-                const row = document.createElement("div");
-                row.className = "bar-row";
-
-                const name =
-                    document.createElement("div");
-
-                name.textContent = label;
-
-                const track =
-                    document.createElement("div");
-
-                track.className = "bar-track";
-
-                const fill =
-                    document.createElement("div");
-
-                fill.className =
-                    "bar-fill " +
-                    barClassFunction(label);
-
-                fill.style.width =
-                    `${(value / maximum) * 100}%`;
-
-                const total =
-                    document.createElement("strong");
-
-                total.textContent = value;
-
-                track.appendChild(fill);
-                row.append(name, track, total);
-                container.appendChild(row);
-            }
-        );
-    }
-
-    function updateCharts(data) {
-        const statusValues = {
-            Open: countStatus(data, "Open"),
-            Investigation:
-                countStatus(data, "Investigation"),
-            Closed: countStatus(data, "Closed")
-        };
-
-        createBarChart(
-            "statusChart",
-            statusValues,
-            label =>
-                "status-" + label.toLowerCase()
-        );
-
-        const supplierValues = {};
-
-        data.forEach(item => {
-            supplierValues[item.supplier] =
-                (supplierValues[item.supplier] || 0) + 1;
-        });
-
-        if (Object.keys(supplierValues).length === 0) {
-            supplierValues["No data"] = 0;
-        }
-
-        createBarChart(
-            "supplierChart",
-            supplierValues,
-            () => ""
-        );
-    }
-
-    function createStatusBadge(status) {
-        const badge = document.createElement("span");
-
-        badge.className =
-            "badge badge-" + status.toLowerCase();
-
-        badge.textContent = status;
-
-        return badge;
-    }
-
-    function isOverdue(item) {
-        if (item.status === "Closed") {
-            return false;
-        }
-
-        const today = new Date();
-        const dueDate = new Date(
-            item.dueDate + "T23:59:59"
-        );
-
-        return dueDate < today;
-    }
-
-    function updateTable(data) {
-        const tableBody =
-            document.getElementById("caseTableBody");
-
-        const emptyMessage =
-            document.getElementById("emptyMessage");
-
-        tableBody.innerHTML = "";
-        emptyMessage.hidden = data.length !== 0;
-
-        data.forEach(item => {
-            const row = document.createElement("tr");
-
-            const values = [
-                item.caseId,
-                item.supplier,
-                item.partNo,
-                item.concern
-            ];
-
-            values.forEach(value => {
-                const cell =
-                    document.createElement("td");
-
-                cell.textContent = value;
-                row.appendChild(cell);
-            });
-
-            const statusCell =
-                document.createElement("td");
-
-            statusCell.appendChild(
-                createStatusBadge(item.status)
-            );
-
-            row.appendChild(statusCell);
-
-            const ownerCell =
-                document.createElement("td");
-
-            ownerCell.textContent = item.owner;
-            row.appendChild(ownerCell);
-
-            const dueDateCell =
-                document.createElement("td");
-
-            dueDateCell.textContent = item.dueDate;
-
-            if (isOverdue(item)) {
-                dueDateCell.classList.add("overdue");
-                dueDateCell.textContent += " (Overdue)";
-            }
-
-            row.appendChild(dueDateCell);
-            tableBody.appendChild(row);
-        });
-    }
-
-    function updateDashboard() {
-        const filteredCases = getFilteredCases();
-
-        updateCards(filteredCases);
-        updateCharts(filteredCases);
-        updateTable(filteredCases);
-    }
-
-    supplierFilter.addEventListener(
-        "change",
-        updateDashboard
+  const SUPABASE_URL =
+    "https://bqhdnltfiuvukpvxcrvn.supabase.co";
+
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_ItdbN22h4DbijzPrSP1RWg_rAHx2fkH";
+
+  const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  let cases = [];
+
+  const supplierFilter =
+    document.getElementById("supplierFilter");
+
+  const statusFilter =
+    document.getElementById("statusFilter");
+
+  const searchInput =
+    document.getElementById("searchInput");
+
+  const resetButton =
+    document.getElementById("resetButton");
+
+  const connectionStatus =
+    document.getElementById("connectionStatus");
+
+  function setConnectionStatus(type, message) {
+    connectionStatus.className =
+      "connection-status connection-" + type;
+
+    connectionStatus.textContent = message;
+  }
+
+  function convertDatabaseCase(item) {
+    return {
+      id: item.id,
+      caseId: item.case_id || "",
+      supplier: item.supplier || "",
+      partNo: item.part_number || "",
+      concern: item.concern || "",
+      status: item.status || "",
+      severity: item.severity || "",
+      owner: item.owner || "",
+      issueDate: item.issue_date || "",
+      dueDate: item.due_date || "",
+      latestAction: item.latest_action || "",
+      nextAction: item.next_action || "",
+      updatedBy: item.updated_by || "",
+      createdAt: item.created_at || "",
+      updatedAt: item.updated_at || ""
+    };
+  }
+
+  async function loadCasesFromSupabase() {
+    setConnectionStatus(
+      "loading",
+      "Loading data from Supabase..."
     );
 
-    statusFilter.addEventListener(
-        "change",
-        updateDashboard
+    const { data, error } = await db
+      .from("quality_cases")
+      .select("*")
+      .order("updated_at", {
+        ascending: false
+      });
+
+    if (error) {
+      console.error(
+        "Supabase load error:",
+        error
+      );
+
+      setConnectionStatus(
+        "error",
+        "Supabase connection error: " +
+          error.message
+      );
+
+      cases = [];
+      updateSupplierFilter();
+      updateDashboard();
+      return;
+    }
+
+    cases = data.map(convertDatabaseCase);
+
+    updateSupplierFilter();
+    updateDashboard();
+
+    setConnectionStatus(
+      "success",
+      "Connected to Supabase | " +
+        cases.length +
+        " cases loaded | Realtime enabled"
     );
 
-    searchInput.addEventListener(
-        "input",
-        updateDashboard
+    console.log(
+      "Cases from Supabase:",
+      data
     );
+  }
 
-    resetButton.addEventListener("click", () => {
-        supplierFilter.value = "All";
-        statusFilter.value = "All";
-        searchInput.value = "";
+  function updateSupplierFilter() {
+    const previousValue =
+      supplierFilter.value;
 
-        updateDashboard();
+    supplierFilter.innerHTML =
+      '<option value="All">All suppliers</option>';
+
+    const suppliers = [
+      ...new Set(
+        cases
+          .map(item => item.supplier)
+          .filter(Boolean)
+      )
+    ].sort();
+
+    suppliers.forEach(supplier => {
+      const option =
+        document.createElement("option");
+
+      option.value = supplier;
+      option.textContent = supplier;
+
+      supplierFilter.appendChild(option);
     });
 
-    initializeSupplierFilter();
-    updateDashboard();
+    const supplierStillExists =
+      previousValue === "All" ||
+      suppliers.includes(previousValue);
+
+    supplierFilter.value =
+      supplierStillExists
+        ? previousValue
+        : "All";
+  }
+
+  function getFilteredCases() {
+    const supplier =
+      supplierFilter.value;
+
+    const status =
+      statusFilter.value;
+
+    const searchTerm =
+      searchInput.value
+        .trim()
+        .toLowerCase();
+
+    return cases.filter(item => {
+      const matchesSupplier =
+        supplier === "All" ||
+        item.supplier === supplier;
+
+      const matchesStatus =
+        status === "All" ||
+        item.status === status;
+
+      const searchableText = [
+        item.caseId,
+        item.supplier,
+        item.partNo,
+        item.concern,
+        item.status,
+        item.severity,
+        item.owner,
+        item.latestAction,
+        item.nextAction
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch =
+        searchableText.includes(searchTerm);
+
+      return (
+        matchesSupplier &&
+        matchesStatus &&
+        matchesSearch
+      );
+    });
+  }
+
+  function countStatus(data, status) {
+    return data.filter(
+      item => item.status === status
+    ).length;
+  }
+
+  function updateCards(data) {
+    document.getElementById(
+      "totalCases"
+    ).textContent = data.length;
+
+    document.getElementById(
+      "openCases"
+    ).textContent =
+      countStatus(data, "Open");
+
+    document.getElementById(
+      "investigationCases"
+    ).textContent =
+      countStatus(data, "Investigation");
+
+    document.getElementById(
+      "closedCases"
+    ).textContent =
+      countStatus(data, "Closed");
+  }
+
+  function convertToClassName(text) {
+    return String(text)
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "");
+  }
+
+  function createBarChart(
+    containerId,
+    values,
+    barClassFunction
+  ) {
+    const container =
+      document.getElementById(containerId);
+
+    container.innerHTML = "";
+
+    const maximum =
+      Math.max(
+        ...Object.values(values),
+        1
+      );
+
+    Object.entries(values).forEach(
+      ([label, value]) => {
+        const row =
+          document.createElement("div");
+
+        row.className = "bar-row";
+
+        const name =
+          document.createElement("div");
+
+        name.textContent = label;
+
+        const track =
+          document.createElement("div");
+
+        track.className = "bar-track";
+
+        const fill =
+          document.createElement("div");
+
+        fill.className =
+          "bar-fill " +
+          barClassFunction(label);
+
+        fill.style.width =
+          `${(value / maximum) * 100}%`;
+
+        const total =
+          document.createElement("strong");
+
+        total.textContent = value;
+
+        track.appendChild(fill);
+
+        row.append(
+          name,
+          track,
+          total
+        );
+
+        container.appendChild(row);
+      }
+    );
+  }
+
+  function updateCharts(data) {
+    const allStatuses = [
+      "Open",
+      "Containment",
+      "Investigation",
+      "Countermeasure",
+      "Effectiveness Monitoring",
+      "Closed"
+    ];
+
+    const statusValues = {};
+
+    allStatuses.forEach(status => {
+      const total =
+        countStatus(data, status);
+
+      if (total > 0) {
+        statusValues[status] = total;
+      }
+    });
+
+    if (
+      Object.keys(statusValues).length === 0
+    ) {
+      statusValues["No data"] = 0;
+    }
+
+    createBarChart(
+      "statusChart",
+      statusValues,
+      label =>
+        "status-" +
+        convertToClassName(label)
+    );
+
+    const supplierValues = {};
+
+    data.forEach(item => {
+      if (!item.supplier) {
+        return;
+      }
+
+      supplierValues[item.supplier] =
+        (supplierValues[item.supplier] || 0) +
+        1;
+    });
+
+    if (
+      Object.keys(supplierValues).length === 0
+    ) {
+      supplierValues["No data"] = 0;
+    }
+
+    createBarChart(
+      "supplierChart",
+      supplierValues,
+      () => ""
+    );
+  }
+
+  function createStatusBadge(status) {
+    const badge =
+      document.createElement("span");
+
+    badge.className =
+      "badge badge-" +
+      convertToClassName(status);
+
+    badge.textContent =
+      status || "Not specified";
+
+    return badge;
+  }
+
+  function isOverdue(item) {
+    if (
+      item.status === "Closed" ||
+      !item.dueDate
+    ) {
+      return false;
+    }
+
+    const today = new Date();
+
+    const dueDate = new Date(
+      item.dueDate + "T23:59:59"
+    );
+
+    return dueDate < today;
+  }
+
+  function updateTable(data) {
+    const tableBody =
+      document.getElementById(
+        "caseTableBody"
+      );
+
+    const emptyMessage =
+      document.getElementById(
+        "emptyMessage"
+      );
+
+    tableBody.innerHTML = "";
+
+    emptyMessage.hidden =
+      data.length !== 0;
+
+    data.forEach(item => {
+      const row =
+        document.createElement("tr");
+
+      const values = [
+        item.caseId,
+        item.supplier,
+        item.partNo,
+        item.concern
+      ];
+
+      values.forEach(value => {
+        const cell =
+          document.createElement("td");
+
+        cell.textContent =
+          value || "-";
+
+        row.appendChild(cell);
+      });
+
+      const statusCell =
+        document.createElement("td");
+
+      statusCell.appendChild(
+        createStatusBadge(item.status)
+      );
+
+      row.appendChild(statusCell);
+
+      const ownerCell =
+        document.createElement("td");
+
+      ownerCell.textContent =
+        item.owner || "-";
+
+      row.appendChild(ownerCell);
+
+      const dueDateCell =
+        document.createElement("td");
+
+      dueDateCell.textContent =
+        item.dueDate || "-";
+
+      if (isOverdue(item)) {
+        dueDateCell.classList.add(
+          "overdue"
+        );
+
+        dueDateCell.textContent +=
+          " (Overdue)";
+      }
+
+      row.appendChild(dueDateCell);
+      tableBody.appendChild(row);
+    });
+  }
+
+  function updateDashboard() {
+    const filteredCases =
+      getFilteredCases();
+
+    updateCards(filteredCases);
+    updateCharts(filteredCases);
+    updateTable(filteredCases);
+  }
+
+  supplierFilter.addEventListener(
+    "change",
+    updateDashboard
+  );
+
+  statusFilter.addEventListener(
+    "change",
+    updateDashboard
+  );
+
+  searchInput.addEventListener(
+    "input",
+    updateDashboard
+  );
+
+  resetButton.addEventListener(
+    "click",
+    function () {
+      supplierFilter.value = "All";
+      statusFilter.value = "All";
+      searchInput.value = "";
+
+      updateDashboard();
+    }
+  );
+
+  db
+    .channel("quality-cases-live")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "quality_cases"
+      },
+      function (payload) {
+        console.log(
+          "Realtime change received:",
+          payload
+        );
+
+        loadCasesFromSupabase();
+      }
+    )
+    .subscribe(function (status) {
+      console.log(
+        "Realtime status:",
+        status
+      );
+
+      if (status === "SUBSCRIBED") {
+        console.log(
+          "Supabase realtime connected successfully"
+        );
+      }
+    });
+
+  loadCasesFromSupabase();
 </script>
 
 </body>
