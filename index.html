@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PQA Quality Dashboard</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f3f5f8;
+            color: #1f2937;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 22px 30px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+        }
+
+        header p {
+            margin: 6px 0 0;
+            color: #cbd5e1;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: auto;
+            padding: 24px;
+        }
+
+        .warning {
+            background: #fff7ed;
+            border-left: 5px solid #f97316;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 15px;
+            background: white;
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .filter-group {
+            min-width: 180px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: white;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 11px 18px;
+            background: #2563eb;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border-left: 5px solid #64748b;
+        }
+
+        .card.total {
+            border-color: #2563eb;
+        }
+
+        .card.open {
+            border-color: #dc2626;
+        }
+
+        .card.investigation {
+            border-color: #f59e0b;
+        }
+
+        .card.closed {
+            border-color: #16a34a;
+        }
+
+        .card-title {
+            color: #64748b;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .card-value {
+            margin-top: 8px;
+            font-size: 34px;
+            font-weight: bold;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 140px 1fr 40px;
+            align-items: center;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .bar-track {
+            height: 22px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: #2563eb;
+            transition: width 0.3s;
+        }
+
+        .bar-fill.status-open {
+            background: #dc2626;
+        }
+
+        .bar-fill.status-investigation {
+            background: #f59e0b;
+        }
+
+        .bar-fill.status-closed {
+            background: #16a34a;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge {
+            display: inline-block;
+            border-radius: 999px;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge-open {
+            color: #991b1b;
+            background: #fee2e2;
+        }
+
+        .badge-investigation {
+            color: #92400e;
+            background: #fef3c7;
+        }
+
+        .badge-closed {
+            color: #166534;
+            background: #dcfce7;
+        }
+
+        .overdue {
+            color: #dc2626;
+            font-weight: bold;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            main {
+                padding: 14px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>PQA Quality Dashboard</h1>
+    <p>Quality case monitoring and action follow-up</p>
+</header>
+
+<main>
+
+    <div class="warning">
+        <strong>Prototype:</strong>
+        This dashboard uses sample data only.
+        Do not upload confidential company data to a public website.
+    </div>
+
+    <section class="filters">
+
+        <div class="filter-group">
+            <label for="supplierFilter">Supplier</label>
+
+            <select id="supplierFilter">
+                <option value="All">All suppliers</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="statusFilter">Status</label>
+
+            <select id="statusFilter">
+                <option value="All">All statuses</option>
+                <option value="Open">Open</option>
+                <option value="Investigation">Investigation</option>
+                <option value="Closed">Closed</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="searchInput">Search</label>
+
+            <input
+                id="searchInput"
+                type="text"
+                placeholder="Case ID, part no., concern..."
+            >
+        </div>
+
+        <button id="resetButton" type="button">
+            Reset filters
+        </button>
+
+    </section>
+
+    <section class="cards">
+
+        <div class="card total">
+            <div class="card-title">TOTAL CASES</div>
+            <div class="card-value" id="totalCases">0</div>
+        </div>
+
+        <div class="card open">
+            <div class="card-title">OPEN</div>
+            <div class="card-value" id="openCases">0</div>
+        </div>
+
+        <div class="card investigation">
+            <div class="card-title">INVESTIGATION</div>
+            <div class="card-value" id="investigationCases">0</div>
+        </div>
+
+        <div class="card closed">
+            <div class="card-title">CLOSED</div>
+            <div class="card-value" id="closedCases">0</div>
+        </div>
+
+    </section>
+
+    <section class="chart-row">
+
+        <div class="panel">
+            <h2>Cases by Status</h2>
+            <div id="statusChart"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Cases by Supplier</h2>
+            <div id="supplierChart"></div>
+        </div>
+
+    </section>
+
+    <section class="panel">
+
+        <h2>Case Details</h2>
+
+        <div class="table-container">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Case ID</th>
+                        <th>Supplier</th>
+                        <th>Part Number</th>
+                        <th>Concern</th>
+                        <th>Status</th>
+                        <th>Owner</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+
+                <tbody id="caseTableBody"></tbody>
+            </table>
+
+            <div
+                id="emptyMessage"
+                class="empty-message"
+                hidden
+            >
+                No cases match the selected filters.
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer>
+    PQA Quality Dashboard | Sample prototype
+</footer>
+
+<script>
+    const cases = [
+        {
+            caseId: "Q-001",
+            supplier: "Supplier A",
+            partNo: "46501-ABCDE",
+            concern: "Abnormal pedal noise",
+            status: "Open",
+            owner: "PQA",
+            dueDate: "2026-12-01"
+        },
+        {
+            caseId: "Q-002",
+            supplier: "Supplier B",
+            partNo: "14463-FGHIJ",
+            concern: "Dust seal position",
+            status: "Investigation",
+            owner: "Supplier",
+            dueDate: "2026-12-05"
+        },
+        {
+            caseId: "Q-003",
+            supplier: "Supplier A",
+            partNo: "28090-KLMNO",
+            concern: "Display delamination",
+            status: "Closed",
+            owner: "Design",
+            dueDate: "2026-11-20"
+        },
+        {
+            caseId: "Q-004",
+            supplier: "Supplier C",
+            partNo: "11750-PQRST",
+            concern: "Auto tensioner noise",
+            status: "Closed",
+            owner: "PQA",
+            dueDate: "2026-11-12"
+        },
+        {
+            caseId: "Q-005",
+            supplier: "Supplier B",
+            partNo: "24014-UVWXY",
+            concern: "Harness length confirmation",
+            status: "Investigation",
+            owner: "VQA",
+            dueDate: "2026-12-10"
+        },
+        {
+            caseId: "Q-006",
+            supplier: "Supplier D",
+            partNo: "40015-ZABCD",
+            concern: "TV-Link loose noise",
+            status: "Open",
+            owner: "Supplier",
+            dueDate: "2026-11-25"
+        }
+    ];
+
+    const supplierFilter =
+        document.getElementById("supplierFilter");
+
+    const statusFilter =
+        document.getElementById("statusFilter");
+
+    const searchInput =
+        document.getElementById("searchInput");
+
+    const resetButton =
+        document.getElementById("resetButton");
+
+    function initializeSupplierFilter() {
+        const suppliers = [
+            ...new Set(cases.map(item => item.supplier))
+        ].sort();
+
+        suppliers.forEach(supplier => {
+            const option = document.createElement("option");
+
+            option.value = supplier;
+            option.textContent = supplier;
+
+            supplierFilter.appendChild(option);
+        });
+    }
+
+    function getFilteredCases() {
+        const supplier = supplierFilter.value;
+        const status = statusFilter.value;
+        const searchTerm =
+            searchInput.value.trim().toLowerCase();
+
+        return cases.filter(item => {
+            const matchesSupplier =
+                supplier === "All" ||
+                item.supplier === supplier;
+
+            const matchesStatus =
+                status === "All" ||
+                item.status === status;
+
+            const searchableText = [
+                item.caseId,
+                item.supplier,
+                item.partNo,
+                item.concern,
+                item.status,
+                item.owner
+            ].join(" ").toLowerCase();
+
+            const matchesSearch =
+                searchableText.includes(searchTerm);
+
+            return (
+                matchesSupplier &&
+                matchesStatus &&
+                matchesSearch
+            );
+        });
+    }
+
+    function countStatus(data, status) {
+        return data.filter(
+            item => item.status === status
+        ).length;
+    }
+
+    function updateCards(data) {
+        document.getElementById("totalCases").textContent =
+            data.length;
+
+        document.getElementById("openCases").textContent =
+            countStatus(data, "Open");
+
+        document.getElementById(
+            "investigationCases"
+        ).textContent =
+            countStatus(data, "Investigation");
+
+        document.getElementById("closedCases").textContent =
+            countStatus(data, "Closed");
+    }
+
+    function createBarChart(
+        containerId,
+        values,
+        barClassFunction
+    ) {
+        const container =
+            document.getElementById(containerId);
+
+        container.innerHTML = "";
+
+        const maximum =
+            Math.max(...Object.values(values), 1);
+
+        Object.entries(values).forEach(
+            ([label, value]) => {
+                const row = document.createElement("div");
+                row.className = "bar-row";
+
+                const name =
+                    document.createElement("div");
+
+                name.textContent = label;
+
+                const track =
+                    document.createElement("div");
+
+                track.className = "bar-track";
+
+                const fill =
+                    document.createElement("div");
+
+                fill.className =
+                    "bar-fill " +
+                    barClassFunction(label);
+
+                fill.style.width =
+                    `${(value / maximum) * 100}%`;
+
+                const total =
+                    document.createElement("strong");
+
+                total.textContent = value;
+
+                track.appendChild(fill);
+                row.append(name, track, total);
+                container.appendChild(row);
+            }
+        );
+    }
+
+    function updateCharts(data) {
+        const statusValues = {
+            Open: countStatus(data, "Open"),
+            Investigation:
+                countStatus(data, "Investigation"),
+            Closed: countStatus(data, "Closed")
+        };
+
+        createBarChart(
+            "statusChart",
+            statusValues,
+            label =>
+                "status-" + label.toLowerCase()
+        );
+
+        const supplierValues = {};
+
+        data.forEach(item => {
+            supplierValues[item.supplier] =
+                (supplierValues[item.supplier] || 0) + 1;
+        });
+
+        if (Object.keys(supplierValues).length === 0) {
+            supplierValues["No data"] = 0;
+        }
+
+        createBarChart(
+            "supplierChart",
+            supplierValues,
+            () => ""
+        );
+    }
+
+    function createStatusBadge(status) {
+        const badge = document.createElement("span");
+
+        badge.className =
+            "badge badge-" + status.toLowerCase();
+
+        badge.textContent = status;
+
+        return badge;
+    }
+
+    function isOverdue(item) {
+        if (item.status === "Closed") {
+            return false;
+        }
+
+        const today = new Date();
+        const dueDate = new Date(
+            item.dueDate + "T23:59:59"
+        );
+
+        return dueDate < today;
+    }
+
+    function updateTable(data) {
+        const tableBody =
+            document.getElementById("caseTableBody");
+
+        const emptyMessage =
+            document.getElementById("emptyMessage");
+
+        tableBody.innerHTML = "";
+        emptyMessage.hidden = data.length !== 0;
+
+        data.forEach(item => {
+            const row = document.createElement("tr");
+
+            const values = [
+                item.caseId,
+                item.supplier,
+                item.partNo,
+                item.concern
+            ];
+
+            values.forEach(value => {
+                const cell =
+                    document.createElement("td");
+
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            const statusCell =
+                document.createElement("td");
+
+            statusCell.appendChild(
+                createStatusBadge(item.status)
+            );
+
+            row.appendChild(statusCell);
+
+            const ownerCell =
+                document.createElement("td");
+
+            ownerCell.textContent = item.owner;
+            row.appendChild(ownerCell);
+
+            const dueDateCell =
+                document.createElement("td");
+
+            dueDateCell.textContent = item.dueDate;
+
+            if (isOverdue(item)) {
+                dueDateCell.classList.add("overdue");
+                dueDateCell.textContent += " (Overdue)";
+            }
+
+            row.appendChild(dueDateCell);
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updateDashboard() {
+        const filteredCases = getFilteredCases();
+
+        updateCards(filteredCases);
+        updateCharts(filteredCases);
+        updateTable(filteredCases);
+    }
+
+    supplierFilter.addEventListener(
+        "change",
+        updateDashboard
+    );
+
+    statusFilter.addEventListener(
+        "change",
+        updateDashboard
+    );
+
+    searchInput.addEventListener(
+        "input",
+        updateDashboard
+    );
+
+    resetButton.addEventListener("click", () => {
+        supplierFilter.value = "All";
+        statusFilter.value = "All";
+        searchInput.value = "";
+
+        updateDashboard();
+    });
+
+    initializeSupplierFilter();
+    updateDashboard();
+</script>
+
+</body>
+</html>
